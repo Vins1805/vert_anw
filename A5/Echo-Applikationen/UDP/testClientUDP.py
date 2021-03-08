@@ -3,13 +3,6 @@
 import pytest
 from echoClientUDP import *
 
-
-@pytest.mark.parametrize("msg,result", tests)
-def test_json(msg, result):
-    assert echo_client(json.dumps(msg)) == result
-    msg["function"] = "reset"
-    echo_client(json.dumps(msg))
-
 def fancy_decorator(func):
     def wrapper(sid):
         print("NEW TEST")
