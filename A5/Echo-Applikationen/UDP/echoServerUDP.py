@@ -8,11 +8,18 @@ exit /b 0
 #!/usr/bin/env python
 import socket
 import json
+import sys
+import pickle
 
 host = '0.0.0.0'
 sport = 53      # own port
 dataSize = 1024
-database = dict()
+database = {
+    "name": None,
+    "value": None,
+    "SID": None
+    }
+listOfClients = list()
 
 
 def echo_server():
@@ -54,6 +61,11 @@ def echo_server():
                     data = reset(data["SID"])
                 except KeyError:
                     data = "Name, Value or SID is missing!"
+            elif func == "exit":
+                try:
+                    data = exit(data["SID"])
+                except KeyError:
+                    data = "Name, Value or SID is missing!"
             else:
                 data = "NameError(function not found)"
             
@@ -83,7 +95,12 @@ def register(name, value, sid):
     if not isinstance(sid, str):
         return "ValueError(Value isn't a string)"
     try:
-        database[sid][name] = value
+        database.update({ "name": name })
+        database.update({ "value": value })
+        database.update({ "SID": sid })
+        listOfClients.append(database.copy())
+        with open("test.pkl", "wb") as pickle_file:
+            pickle.dump(database, pickle_file)
     except KeyError:
         database[sid] = {}
         database[sid][name] = value
@@ -99,11 +116,22 @@ def unregister(name, sid):
     except KeyError:
         return f"Key '{name}' not found!"
 
-def query(sid):
+"""def query(sid):
     if not isinstance(sid, str):
         return "ValueError(Value isn't a string)"
     try:
         return database[sid]
+    except KeyError:
+        return "KeyError(SID does not exist)!"""
+    
+def query(sid):
+    if not isinstance(sid, str):
+        return "ValueError(Value isn't a string)"
+    try:
+        pickle_in = open("dict.pickle", "rb")
+        x = pickle.load(pickle_in)
+        return x
+        
     except KeyError:
         return "KeyError(SID does not exist)!"
 
@@ -116,7 +144,19 @@ def reset(sid):
     except KeyError:
         return "KeyError(SID does not exist)!"
 
+def exit(sid):
+    if not isinstance(sid, str):
+        return "ValueError(Value isn't a string)"
+    try:
+        return listOfClients
+    except KeyError:
+        return "KeyError(SID does not exist)!"
+    finally:
+        #sys.exit()
+        pass
+    
 
 
 if __name__ == '__main__':
     echo_server()
+    
