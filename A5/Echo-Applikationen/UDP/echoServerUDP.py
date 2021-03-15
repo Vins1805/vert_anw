@@ -73,6 +73,7 @@ def sendMSG(data,address):
     sendSock.close()
 
 def register(name, value, sid):
+    """Gets a KeyError if SID doesn't exist, so a new SID gets created."""
     if not isinstance(name, str):
         return "ValueError(Value isn't a string)"
     if not isinstance(value, str):
@@ -112,7 +113,6 @@ def reset(sid):
         return "Database got cleared!"
     except KeyError:
         return "KeyError(SID does not exist)!"
-
 
 
 if __name__ == '__main__':

@@ -97,3 +97,10 @@ def test_reset3(sid="1234"):
     echo_client(json.dumps(msg))
     msg = {"function": "reset", "SID": sid}
     assert echo_client(json.dumps(msg)) == "Database got cleared!"
+
+
+
+
+
+print(dict(sid = 1234))
+
