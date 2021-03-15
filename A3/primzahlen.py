@@ -1,25 +1,27 @@
 from typing import List, Union
 import threading
 import concurrent.futures
-import numpy as np
 import time
 
 
 class Barriere():
-    def __init__(self, n):
+    def __init__(self, n, print_locks):
         self.lock = threading.Lock()
         self.n = n
+        self.print_locks = print_locks
 
     def p(self):
         """ Acquire. """
         self.lock.acquire()
-        print("lock acquired")
+        if self.print_locks:
+            print("lock acquired")
         return self.n
 
     def v(self):
         """ Release. """
         self.lock.release()
-        print("lock releases")
+        if self.print_locks:
+            print("lock releases")
 
 
 def read_txt(filepath) -> list:
@@ -34,6 +36,13 @@ def factorial(end, start=1):
     return result
 
 
+def multiply(l: list) -> int:
+    result = 1
+    for i in l:
+        result *= i
+    return result
+
+
 def is_prime_number(end: int, start: int=1, barrier: Barriere=None, return_bool=False, _factorial=True) -> Union[bool, int]:
     if return_bool:
         if end == 0:
@@ -43,11 +52,17 @@ def is_prime_number(end: int, start: int=1, barrier: Barriere=None, return_bool=
         else:
             n = end
         if not _factorial:
+            #print(end, n)
             return end % n == n-1
         return factorial(end-1, start) % n == n-1
-    n = barrier.p()
+    if barrier:
+        n = barrier.p()
+    else:
+        n = end
     result = factorial(end, start) % n
-    barrier.v()
+    if barrier:
+        barrier.v()
+    #print(result)
     return result
 
 
@@ -58,52 +73,50 @@ def split_up(n: int, t: int) -> List[tuple]:
     splitted_prime = list()
     for i in range(0, t):
         splitted_prime += [(int(i*(n-1)/t+1), int((i+1)*(n-1)/t) if i+1 != t else n-1)]
+    #print(splitted_prime)
     return splitted_prime
 
-def build_threads(n):
+def build_threads(n, print_locks=False):
 
-    sharedVar = Barriere(n)
+    sharedVar = Barriere(n, print_locks)
 
     with concurrent.futures.ThreadPoolExecutor() as executor:
         results = list(executor.map(lambda p: is_prime_number(*p), [(*i[::-1], sharedVar) for i in split_up(n, threads)]))
-        print(f"Is {n} a prime number: {is_prime_number(np.prod(results), barrier=sharedVar, return_bool=True, _factorial=False)}")
+        print(f"Is {n} a prime number: {is_prime_number(multiply(results), barrier=sharedVar, return_bool=True, _factorial=False)}")
 
 
 if __name__ == "__main__":
     system_start_time = time.time()
     process_start_time = time.process_time()
-    
-    
-    threads = 32
+    print_locks = False
+
+    # CHANGE AMOUNT OF THREADS
+    threads = 124
     
     real_prime_numbers = read_txt("echte_primzahlen.txt")
     fake_prime_numbers = read_txt("fake_primzahlen.txt")
 
-    total_time = 0
-
-    if False:
-        n = 1000000
-        
-        build_threads(n)
-        print(f"current total time: {total_time} (CPU)")
-    
+    # CHANGE TO TRUE TO RUN CODE
     if True:
+        # for one number n the primenumber
+        n = 5000000
+        build_threads(n)
+    
+    if False:
+        # read all real prime numbers from text file
         for pn in real_prime_numbers:
             if pn < threads*2:
                 print(f"skipped number {pn} due to conflicts with threads.")
                 continue
-            #print(f"{pn} is prime number: {is_prime_number(pn)}")
-            build_threads(pn)
-            print(f"current total time: {total_time} (CPU)")
+            build_threads(pn, print_locks)
 
-    if True:
+    if False:
+        # read all fake prime numbers from text file
         for pn in fake_prime_numbers:
             if pn < threads*2:
                 print(f"skipped number {pn} due to conflicts with threads.")
                 continue
-            #print(f"{pn} is prime number: {is_prime_number(pn)}")
-            build_threads(pn)
-            print(f"current total time: {total_time} (CPU)")
+            build_threads(pn, print_locks)
     
 
     system_end_time = time.time()

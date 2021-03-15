@@ -72,9 +72,6 @@ def sendMSG(data,address):
     sendSock.sendto(data.encode(),address)
     sendSock.close()
 
-def to_json(data):
-    return json.dumps({"message": data})
-
 def register(name, value, sid):
     if not isinstance(name, str):
         return "ValueError(Value isn't a string)"
