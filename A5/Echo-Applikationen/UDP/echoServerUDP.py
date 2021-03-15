@@ -99,11 +99,9 @@ def register(name, value, sid):
         database.update({ "value": value })
         database.update({ "SID": sid })
         listOfClients.append(database.copy())
-        with open("test.pkl", "wb") as pickle_file:
-            pickle.dump(database, pickle_file)
+        store_data(listOfClients)
     except KeyError:
-        database[sid] = {}
-        database[sid][name] = value
+        print("KeyError")
     return f"Name '{name}' got {value} as value."
 
 def unregister(name, sid):
@@ -112,6 +110,12 @@ def unregister(name, sid):
     if not isinstance(sid, str):
         return "ValueError(Value isn't a string)"
     try:
+        data = get_data()
+        for i, dic in enumerate(data):
+            if dic["sid"] == sid:
+            
+        
+        
         return f"Deleted: {name} - {database[sid].pop(name)}"
     except KeyError:
         return f"Key '{name}' not found!"
@@ -128,9 +132,8 @@ def query(sid):
     if not isinstance(sid, str):
         return "ValueError(Value isn't a string)"
     try:
-        pickle_in = open("dict.pickle", "rb")
-        x = pickle.load(pickle_in)
-        return x
+        data = get_data()
+        return data
         
     except KeyError:
         return "KeyError(SID does not exist)!"
@@ -140,6 +143,7 @@ def reset(sid):
         return "ValueError(Value isn't a string)"
     try:
         database[sid].clear()
+        
         return "Database got cleared!"
     except KeyError:
         return "KeyError(SID does not exist)!"
@@ -148,12 +152,23 @@ def exit(sid):
     if not isinstance(sid, str):
         return "ValueError(Value isn't a string)"
     try:
-        return listOfClients
+        with open("test.pkl", "rb") as pickle_file:
+            data = pickle.load(pickle_file)
+        return data
     except KeyError:
         return "KeyError(SID does not exist)!"
     finally:
-        #sys.exit()
-        pass
+        sys.exit()
+
+def get_data():
+    with open("test.pkl", "rb") as pickle_file:
+            data = pickle.load(pickle_file)
+    return data
+
+def store_data(data):
+    with open("test.pkl", "wb") as pickle_file:
+        pickle.dump(data, pickle_file)
+
     
 
 

@@ -98,6 +98,12 @@ def test_reset3(sid):
     echo_client(json.dumps(msg))
     msg = {"function": "reset", "SID": sid}
     assert echo_client(json.dumps(msg)) == "Database got cleared!"
+
+@fancy_decorator
+@reset_decorator
+def test_reset4(sid):
+    msg = {"function": "reset", "SID": sid}
+    assert echo_client(json.dumps(msg)) == "Database got cleared!"
     
 @fancy_decorator
 @reset_decorator
@@ -106,12 +112,14 @@ def test_exit1(sid):
     echo_client(json.dumps(msg))
     msg = {"function": "register", "name": "localhost", "value": "127.0.0.2", "SID": sid}
     echo_client(json.dumps(msg))
-    msg = {"function": "exit", "name": "localhost", "value": "127.0.0.1", "SID": sid}
+    msg = {"function": "exit", "SID": sid}
     assert echo_client(json.dumps(msg)) == "All clients connected to this server"
     
     
 if __name__ == '__main__':
     test_query1(sid="1234")
+    test_reset4(sid = "1234")
+    test_reset2(sid="1234")
     test_exit1(sid="1234")
     
     test_json1(sid="1234")
@@ -123,6 +131,6 @@ if __name__ == '__main__':
     
     test_query2(sid="1234")
     test_reset1(sid="1240")
-    test_reset2(sid="1234")
+   
     test_reset3(sid="1234")
     
