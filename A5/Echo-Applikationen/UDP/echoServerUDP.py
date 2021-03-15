@@ -122,7 +122,8 @@ def unregister(name, sid):
     try:
         return database[sid]
     except KeyError:
-        return "KeyError(SID does not exist)!"""
+        return "KeyError(SID does not exist)!
+"""
     
 def query(sid):
     if not isinstance(sid, str):
@@ -149,6 +150,7 @@ def exit(sid):
         return "ValueError(Value isn't a string)"
     try:
         return listOfClients
+        return ""
     except KeyError:
         return "KeyError(SID does not exist)!"
     finally:

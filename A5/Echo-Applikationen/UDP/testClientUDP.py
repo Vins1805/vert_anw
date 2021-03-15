@@ -108,11 +108,21 @@ def test_exit1(sid):
     echo_client(json.dumps(msg))
     msg = {"function": "exit", "name": "localhost", "value": "127.0.0.1", "SID": sid}
     assert echo_client(json.dumps(msg)) == "All clients connected to this server"
+
+def test_exit2(sid):
+    msg = {"function": "register", "name": "localhost", "value": "127.0.0.1", "SID": sid}
+    echo_client(json.dumps(msg))
+    msg = {"function": "register", "name": "localhost", "value": "127.0.0.2", "SID": sid}
+    echo_client(json.dumps(msg))
+    msg = {"function": "exit", "name": "localhost", "value": "127.0.0.1", "SID": sid}
+    echo_client(json.dumps(msg))
     
     
 if __name__ == '__main__':
     test_query1(sid="1234")
+    test_exit2(sid="1234")
     test_exit1(sid="1234")
+    
     
     test_json1(sid="1234")
     test_json1(sid="1234")
