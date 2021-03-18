@@ -47,12 +47,27 @@ def test_register2(sid="1234"):
     msg = {"function": "register", "namee": "localhost", "value": "127.0.0.1", "SID": sid}
     assert echo_client(json.dumps(msg)) == "Name, Value or SID is missing!"
 
+def test_register3(sid="1234"):
+    msg = {"function": "register", "name": True, "value": "127.0.0.1", "SID": sid}
+    assert echo_client(json.dumps(msg)) == "ValueError(Name isn't a string)"
+
 @reset_decorator
-def test_unregister1(sid="1234"):
+def test_register4(sid="1234"):
     msg = {"function": "register", "name": "localhost", "value": "127.0.0.1", "SID": sid}
     echo_client(json.dumps(msg))
-    msg["function"] = "unregister"
-    assert echo_client(json.dumps(msg)) == "Deleted: localhost - 127.0.0.1"
+    msg = {"function": "register", "name": "localhost", "value": "127.0.0.1", "SID": "13"}
+    echo_client(json.dumps(msg))
+    msg = {"function": "register", "name": "localhost", "value": "127.0.0.1", "SID": "12124"}
+    echo_client(json.dumps(msg))
+
+@reset_decorator
+def test_unregister1(sid="1234"):
+
+    msg = {"function": "register", "name": "localhost", "value": "127.0.0.1", "SID": sid}
+    echo_client(json.dumps(msg))
+    #msg["function"] = "unregister"
+    msg = {"function": "unregister", "name": "localhost", "SID": sid}
+    assert echo_client(json.dumps(msg)) == "Deleted Client with Name: localhost"
 
 @reset_decorator
 def test_unregister2(sid="1234"):
@@ -63,10 +78,10 @@ def test_unregister2(sid="1234"):
 def test_query1(sid="1234"):
     msg = {"function": "register", "name": "localhost", "value": "127.0.0.1", "SID": sid}
     echo_client(json.dumps(msg))
-    msg = {"function": "register", "name": "ip", "value": "192.1.2.83", "SID": sid}
+    msg = {"function": "register", "name": "ip", "value": "192.1.2.83", "SID": "123456"}
     echo_client(json.dumps(msg))
     msg = {"function": "query", "SID": sid}
-    assert echo_client(json.dumps(msg)) == {'localhost': '127.0.0.1', 'ip': '192.1.2.83'}
+    assert echo_client(json.dumps(msg)) == {'localhost': '127.0.0.1'}
 
 @reset_decorator
 def test_query2(sid="1234"):
@@ -99,8 +114,18 @@ def test_reset3(sid="1234"):
     assert echo_client(json.dumps(msg)) == "Database got cleared!"
 
 
+@reset_decorator
+def test_reset4(sid="1234"):
+    msg = {"function": "reset", "SID": sid}
+    assert echo_client(json.dumps(msg)) == "Database got cleared!"
+    
 
-
-
-print(dict(sid = 1234))
+@reset_decorator
+def test_exit1(sid="1234"):
+    msg = {"function": "register", "name": "localhost", "value": "127.0.0.1", "SID": sid}
+    echo_client(json.dumps(msg))
+    msg = {"function": "register", "name": "localhost", "value": "127.0.0.2", "SID": sid}
+    echo_client(json.dumps(msg))
+    msg = {"function": "exit", "SID": sid}
+    assert echo_client(json.dumps(msg)) == "Server shut down"
 

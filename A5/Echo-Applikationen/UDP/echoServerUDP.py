@@ -8,11 +8,16 @@ exit /b 0
 #!/usr/bin/env python
 import socket
 import json
+import sys
+import pickle
+import os
 
 host = '0.0.0.0'
 sport = 53      # own port
 dataSize = 1024
-database = dict()
+
+client = {    
+}
 
 
 def echo_server():
@@ -54,6 +59,11 @@ def echo_server():
                     data = reset(data["SID"])
                 except KeyError:
                     data = "Name, Value or SID is missing!"
+            elif func == "exit":
+                try:
+                    data = exit(data["SID"])
+                except KeyError:
+                    data = "Name, Value or SID is missing!"
             else:
                 data = "NameError(function not found)"
             
@@ -75,45 +85,78 @@ def sendMSG(data,address):
 def register(name, value, sid):
     """Gets a KeyError if SID doesn't exist, so a new SID gets created."""
     if not isinstance(name, str):
-        return "ValueError(Value isn't a string)"
+        return "ValueError(Name isn't a string)"
     if not isinstance(value, str):
         return "ValueError(Value isn't a string)"
     if not isinstance(sid, str):
-        return "ValueError(Value isn't a string)"
+        return "ValueError(sid isn't a string)"
     try:
-        database[sid][name] = value
+        client[sid][name] = value
+        store_data(client)
     except KeyError:
-        database[sid] = {}
-        database[sid][name] = value
+        print("KeyError")
+        client[sid] = {}
+        client[sid][name] = value
+        store_data(client)
     return f"Name '{name}' got {value} as value."
 
 def unregister(name, sid):
     if not isinstance(name, str):
         return "ValueError(Value isn't a string)"
     if not isinstance(sid, str):
-        return "ValueError(Value isn't a string)"
+        return "ValueError(sid isn't a string)"
     try:
-        return f"Deleted: {name} - {database[sid].pop(name)}"
+        data = get_data()
+        print(data)
+        data[sid].pop(name)
+        store_data(data)
+        return f"Deleted Client with Name: {name}"
     except KeyError:
         return f"Key '{name}' not found!"
 
+    
 def query(sid):
     if not isinstance(sid, str):
-        return "ValueError(Value isn't a string)"
+        return "ValueError(sid isn't a string)"
     try:
-        return database[sid]
+        data = get_data()
+        return data[sid]
+        
     except KeyError:
         return "KeyError(SID does not exist)!"
 
 def reset(sid):
     if not isinstance(sid, str):
-        return "ValueError(Value isn't a string)"
+        return "ValueError(sid isn't a string)"
     try:
-        database[sid].clear()
+        with open("test.pkl", "wb") as pickle_file:
+            pickle.dump([], pickle_file)
+        pickle_file.close()
+        
         return "Database got cleared!"
     except KeyError:
         return "KeyError(SID does not exist)!"
 
+def exit(*args):
+    return "Server shut down"
+    sys.exit()
+    
+        
+
+def get_data():
+    with open("test.pkl", "rb") as pickle_file:
+        data = pickle.load(pickle_file)
+    return data
+
+def store_data(data):
+    with open("test.pkl", "wb") as pickle_file:
+        pickle.dump(data, pickle_file)
+
+    
 
 if __name__ == '__main__':
     echo_server()
+    echo_server()
+    
+
+    
