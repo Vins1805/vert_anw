@@ -82,10 +82,8 @@ def sendMSG(data,address):
     sendSock.sendto(data.encode(),address)
     sendSock.close()
 
-def to_json(data):
-    return json.dumps({"message": data})
-
 def register(name, value, sid):
+    """Gets a KeyError if SID doesn't exist, so a new SID gets created."""
     if not isinstance(name, str):
         return "ValueError(Name isn't a string)"
     if not isinstance(value, str):
@@ -155,7 +153,6 @@ def store_data(data):
         pickle.dump(data, pickle_file)
 
     
-
 
 if __name__ == '__main__':
     echo_server()
