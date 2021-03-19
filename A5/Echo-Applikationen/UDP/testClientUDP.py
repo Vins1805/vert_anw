@@ -60,7 +60,7 @@ def test_register4(sid="1234"):
     msg = {"function": "register", "name": "localhost", "value": "127.0.0.1", "SID": "12124"}
     echo_client(json.dumps(msg))
 
-@reset_decorator
+#@reset_decorator
 def test_unregister1(sid="1234"):
 
     msg = {"function": "register", "name": "localhost", "value": "127.0.0.1", "SID": sid}
