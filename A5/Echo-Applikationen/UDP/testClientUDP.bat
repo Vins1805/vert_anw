@@ -1,4 +1,4 @@
 @echo off
-pytest testClientUDP.py
+python -m pytest testClientUDP.py
 pause
 exit /b

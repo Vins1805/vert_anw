@@ -23,9 +23,33 @@ tests = [
     ({"": ""}, "NameError(function not found)"),
     ]
 
+@reset_decorator
+def test_unregister1(sid="1234"):
+    msg = {"function": "register", "name": "localhost", "value": "127.0.0.1", "SID": sid}
+    echo_client(json.dumps(msg))
+    msg["function"] = "unregister"
+    assert echo_client(json.dumps(msg)) == "Deleted Client with Name: localhost"
+
+@reset_decorator
+def test_unregister2(sid="1234"):
+    msg = {"function": "unregister", "name": "localhost", "SID": sid}
+    assert echo_client(json.dumps(msg)) == "Key 'localhost' not found!"
+
 @pytest.mark.parametrize("msg,result", tests)
 def test_json(msg, result):
     assert echo_client(json.dumps(msg)) == result
+
+def test_query3(sid="1234"):
+    msg = {"function": "register", "name": "localhost", "value": "127.0.0.1", "SID": sid}
+    echo_client(json.dumps(msg))
+    msg = {"function": "register", "name": "localhost", "value": "127.0.0.1", "SID": sid}
+    echo_client(json.dumps(msg))
+    msg = {"function": "register", "name": "localhost", "value": "127.0.0.1", "SID": sid}
+    echo_client(json.dumps(msg))
+    msg = {"function": "register", "name": "ip", "value": "192.1.2.83", "SID": "123456"}
+    echo_client(json.dumps(msg))
+    msg = {"function": "query", "SID": "1234"}
+    assert echo_client(json.dumps(msg)) == "KeyError(SID does not exist)!"
 
 @reset_decorator
 def test_json1(sid="1234"):
@@ -60,19 +84,9 @@ def test_register4(sid="1234"):
     msg = {"function": "register", "name": "localhost", "value": "127.0.0.1", "SID": "12124"}
     echo_client(json.dumps(msg))
 
-@reset_decorator
-def test_unregister1(sid="1234"):
 
-    msg = {"function": "register", "name": "localhost", "value": "127.0.0.1", "SID": sid}
-    echo_client(json.dumps(msg))
-    #msg["function"] = "unregister"
-    msg = {"function": "unregister", "name": "localhost", "SID": sid}
-    assert echo_client(json.dumps(msg)) == "Deleted Client with Name: localhost"
 
-@reset_decorator
-def test_unregister2(sid="1234"):
-    msg = {"function": "unregister", "name": "localhost", "SID": sid}
-    assert echo_client(json.dumps(msg)) == "Key 'localhost' not found!"
+
 
 @reset_decorator
 def test_query1(sid="1234"):
@@ -91,6 +105,9 @@ def test_query2(sid="1234"):
     echo_client(json.dumps(msg))
     msg = {"function": "query", "SID": "1235"}
     assert echo_client(json.dumps(msg)) == "KeyError(SID does not exist)!"
+    
+
+
 
 @reset_decorator
 def test_reset1(sid="1240"):

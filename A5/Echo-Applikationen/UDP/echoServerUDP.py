@@ -109,6 +109,7 @@ def unregister(name, sid):
         data = get_data()
         print(data)
         data[sid].pop(name)
+        print(data)
         store_data(data)
         return f"Deleted Client with Name: {name}"
     except KeyError:
@@ -120,8 +121,8 @@ def query(sid):
         return "ValueError(sid isn't a string)"
     try:
         data = get_data()
+        print(data)
         return data[sid]
-        
     except KeyError:
         return "KeyError(SID does not exist)!"
 
@@ -129,10 +130,11 @@ def reset(sid):
     if not isinstance(sid, str):
         return "ValueError(sid isn't a string)"
     try:
-        with open("test.pkl", "wb") as pickle_file:
-            pickle.dump([], pickle_file)
-        pickle_file.close()
-        
+        data = get_data()
+        print(data)
+        del data[sid]
+        print(data)
+        store_data(data)        
         return "Database got cleared!"
     except KeyError:
         return "KeyError(SID does not exist)!"
