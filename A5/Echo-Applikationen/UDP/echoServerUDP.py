@@ -128,7 +128,7 @@ def query(sid):
     try:
         data = get_data()
         print(data[sid])
-        return data
+        return data[sid]
     except KeyError:
         return "KeyError(SID does not exist)!"
 
