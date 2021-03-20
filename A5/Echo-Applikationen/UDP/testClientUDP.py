@@ -35,6 +35,8 @@ def test_unregister2(sid="1234"):
     msg = {"function": "unregister", "name": "localhost", "SID": sid}
     assert echo_client(json.dumps(msg)) == "Key 'localhost' not found!"
 
+
+
 @pytest.mark.parametrize("msg,result", tests)
 def test_json(msg, result):
     assert echo_client(json.dumps(msg)) == result

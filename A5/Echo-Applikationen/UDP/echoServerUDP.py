@@ -108,7 +108,8 @@ def unregister(name, sid):
     try:
         data = get_data()
         print(data)
-        data[sid].pop(name)
+        
+        del data[sid][name]
         print(data)
         store_data(data)
         return f"Deleted Client with Name: {name}"
