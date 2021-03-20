@@ -37,21 +37,21 @@ def test_unregister2(sid="1234"):
 
 
 
-@pytest.mark.parametrize("msg,result", tests)
-def test_json(msg, result):
-    assert echo_client(json.dumps(msg)) == result
+#@pytest.mark.parametrize("msg,result", tests)
+#def test_json(msg, result):
+    #assert echo_client(json.dumps(msg)) == result
 
 def test_query3(sid="1234"):
-    msg = {"function": "register", "name": "localhost", "value": "127.0.0.1", "SID": sid}
+    msg = {"function": "reset_all"}
     echo_client(json.dumps(msg))
-    msg = {"function": "register", "name": "localhost", "value": "127.0.0.1", "SID": sid}
+    msg = {"function": "register", "name": "hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhlocalhost", "value": "127.0.0.1", "SID": sid}
     echo_client(json.dumps(msg))
-    msg = {"function": "register", "name": "localhost", "value": "127.0.0.1", "SID": sid}
+    msg = {"function": "register", "name": "localhost", "value": "127.0.0.2", "SID": sid}
     echo_client(json.dumps(msg))
     msg = {"function": "register", "name": "ip", "value": "192.1.2.83", "SID": "123456"}
     echo_client(json.dumps(msg))
     msg = {"function": "query", "SID": "1234"}
-    assert echo_client(json.dumps(msg)) == "KeyError(SID does not exist)!"
+    assert echo_client(json.dumps(msg)) == {'localhost': '127.0.0.1', 'localhost': '127.0.0.2'}
 
 @reset_decorator
 def test_json1(sid="1234"):

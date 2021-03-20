@@ -64,6 +64,11 @@ def echo_server():
                     data = exit(data["SID"])
                 except KeyError:
                     data = "Name, Value or SID is missing!"
+            elif func == "reset_all":
+                try:
+                    data = reset_all()
+                except KeyError:
+                    data = "Error in function reset_all"
             else:
                 data = "NameError(function not found)"
             
@@ -122,8 +127,8 @@ def query(sid):
         return "ValueError(sid isn't a string)"
     try:
         data = get_data()
-        print(data)
-        return data[sid]
+        print(data[sid])
+        return data
     except KeyError:
         return "KeyError(SID does not exist)!"
 
@@ -144,6 +149,10 @@ def exit(*args):
     return "Server shut down"
     sys.exit()
     
+def reset_all():
+    store_data([])
+    return "All data got deleted"
+
         
 
 def get_data():
