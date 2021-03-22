@@ -10,7 +10,7 @@ import socket
 import json
 import sys
 import pickle
-import os
+
 
 host = '0.0.0.0'
 sport = 53      # own port
@@ -60,10 +60,7 @@ def echo_server():
                 except KeyError:
                     data = "Name, Value or SID is missing!"
             elif func == "exit":
-                try:
-                    data = exit(data["SID"])
-                except KeyError:
-                    data = "Name, Value or SID is missing!"
+                data = exit()
             elif func == "reset_all":
                 try:
                     data = reset_all()
@@ -148,8 +145,9 @@ def reset(sid):
         return "KeyError(SID does not exist)!"
 
 def exit(*args):
-    return "Server shut down"
-    sys.exit()
+    print("------------------Server shut down---------------------")
+    #sys.exit("Sever shut down. In sys.exit()")
+    
     
 def reset_all():
     store_data({})
@@ -173,7 +171,4 @@ def store_data(data):
 
 if __name__ == '__main__':
     echo_server()
-    echo_server()
-    
-
     

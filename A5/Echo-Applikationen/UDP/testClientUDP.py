@@ -3,16 +3,18 @@
 import pytest
 from echoClientUDP import *
 
+
 def reset_decorator(func):
     def wrapper():
-        msg = {"function": "reset_all", "SID": "1234"}
+        msg = {"function": "reset_all"}
         echo_client(json.dumps(msg))
         func()
     return wrapper
 
 tests = [
+    ({"function": "reset_all"}, "All data got deleted"),
     ({"function": "register", "name": "localhost", "value": "127.0.0.1", "SID": "1234"}, "Name 'localhost' got 127.0.0.1 as value."),
-    ({"function": "unregister", "name": "localhost", "SID": "1234"}, "Deleted: localhost - 127.0.0.1"),
+    ({"function": "unregister", "name": "localhost", "SID": "1234"}, "Deleted Client with Name: localhost"),
     ({"function": "query", "SID": "1234"}, {}),
     ({"function": "reset", "SID": "1234"}, "Database got cleared!"),
     ({"function": "register", "namee": "localhost", "value": "127.0.0.1", "SID": "1234"}, "Name, Value or SID is missing!"),
@@ -22,6 +24,9 @@ tests = [
     ({"name": "localhost", "value": "127.0.0.1", "SID": "1234"}, "NameError(function not found)"),
     ({"": ""}, "NameError(function not found)"),
     ]
+@pytest.mark.parametrize("msg,result", tests)
+def test_json(msg, result):
+    assert echo_client(json.dumps(msg)) == result
 
 @reset_decorator
 def test_unregister1(sid="1234"):
@@ -37,15 +42,11 @@ def test_unregister2(sid="1234"):
 
 
 
-@pytest.mark.parametrize("msg,result", tests)
-def test_json(msg, result):
-    assert echo_client(json.dumps(msg)) == result
+
 
 @reset_decorator
 def test_query3(sid="1234"):
-    msg = {"function": "reset_all"}
-    echo_client(json.dumps(msg))
-    msg = {"function": "register", "name": "hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhlocalhost", "value": "127.0.0.1", "SID": sid}
+    msg = {"function": "register", "name": "localhost", "value": "127.0.0.1", "SID": sid}
     echo_client(json.dumps(msg))
     msg = {"function": "register", "name": "localhost", "value": "127.0.0.2", "SID": sid}
     echo_client(json.dumps(msg))
@@ -137,15 +138,25 @@ def test_reset3(sid="1234"):
 @reset_decorator
 def test_reset4(sid="1234"):
     msg = {"function": "reset", "SID": sid}
-    assert echo_client(json.dumps(msg)) == "Database got cleared!"
-    
+    assert echo_client(json.dumps(msg)) == "KeyError(SID does not exist)!"
 
 @reset_decorator
 def test_exit1(sid="1234"):
-    msg = {"function": "register", "name": "localhost", "value": "127.0.0.1", "SID": sid}
+    msg = {"function": "register", "name": "localhostbnbniljhnilhloi", "value": "127.0.0.1", "SID": sid}
     echo_client(json.dumps(msg))
     msg = {"function": "register", "name": "localhost", "value": "127.0.0.2", "SID": sid}
     echo_client(json.dumps(msg))
-    msg = {"function": "exit", "SID": sid}
-    assert echo_client(json.dumps(msg)) == "Server shut down"
+    msg = {"function": "exit"}
+    echo_client(json.dumps(msg))
+    msg = {"function": "query", "SID": sid}
+    assert echo_client(json.dumps(msg)) == {'localhost': '127.0.0.1', 'localhost': '127.0.0.2'}
+    
+
+
+
+
+
+
+
+
 
