@@ -41,6 +41,7 @@ def test_unregister2(sid="1234"):
 def test_json(msg, result):
     assert echo_client(json.dumps(msg)) == result
 
+@reset_decorator
 def test_query3(sid="1234"):
     msg = {"function": "reset_all"}
     echo_client(json.dumps(msg))

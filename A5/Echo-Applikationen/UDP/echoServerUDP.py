@@ -16,7 +16,7 @@ host = '0.0.0.0'
 sport = 53      # own port
 dataSize = 1024
 
-client = {    
+data = {    
 }
 
 
@@ -96,13 +96,14 @@ def register(name, value, sid):
     if not isinstance(sid, str):
         return "ValueError(sid isn't a string)"
     try:
-        client[sid][name] = value
-        store_data(client)
+        data = get_data()
+        data[sid][name] = value
+        store_data(data)
     except KeyError:
         print("KeyError")
-        client[sid] = {}
-        client[sid][name] = value
-        store_data(client)
+        data[sid] = {}
+        data[sid][name] = value
+        store_data(data)
     return f"Name '{name}' got {value} as value."
 
 def unregister(name, sid):
@@ -128,6 +129,7 @@ def query(sid):
     try:
         data = get_data()
         print(data[sid])
+        print(data)
         return data[sid]
     except KeyError:
         return "KeyError(SID does not exist)!"
@@ -150,15 +152,18 @@ def exit(*args):
     sys.exit()
     
 def reset_all():
-    store_data([])
+    store_data({})
     return "All data got deleted"
 
         
 
 def get_data():
-    with open("test.pkl", "rb") as pickle_file:
-        data = pickle.load(pickle_file)
-    return data
+    try:
+        with open("test.pkl", "rb") as pickle_file:
+            data = pickle.load(pickle_file)
+        return data
+    except (OSError, IOError) as e:
+        return dict()
 
 def store_data(data):
     with open("test.pkl", "wb") as pickle_file:
