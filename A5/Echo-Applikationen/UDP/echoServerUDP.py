@@ -10,14 +10,40 @@ import socket
 import json
 import sys
 import pickle
+import threading
 
 
 host = '0.0.0.0'
 sport = 53      # own port
 dataSize = 1024
 
-data = {    
-}
+
+
+
+
+
+class Datenbank():
+    def __init__(self, print_locks = True):
+        self.lock = threading.Lock()
+        self.data = {}
+        self.print_locks = print_locks
+
+    def p(self):
+        """ Acquire. """
+        self.lock.acquire()
+        self.data = get_data()
+        if self.print_locks:
+            print("lock acquired")
+        return self.data
+
+    def v(self, value):
+        """ Release. """
+        store_data(value)
+        self.lock.release()
+        if self.print_locks:
+            print("lock releases")
+
+db = Datenbank()
 
 
 def echo_server():
@@ -25,6 +51,8 @@ def echo_server():
     receiveSock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     receiveSock.bind((host,sport))
     print("Starting up echo server on %s port %s" % (host, sport))
+    
+    
 
     while True: 
         print("Waiting to receive message")
@@ -60,7 +88,7 @@ def echo_server():
                 except KeyError:
                     data = "Name, Value or SID is missing!"
             elif func == "exit":
-                data = exit()
+                data = exit1()
             elif func == "reset_all":
                 try:
                     data = reset_all()
@@ -74,16 +102,29 @@ def echo_server():
 
 def to_json_decorator(func):
     def wrapper(data,address):
+        print(data)
         func(json.dumps({"message": data}), address)
     return wrapper
 
 @to_json_decorator
 def sendMSG(data,address):
+    print(data)
     sendSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sendSock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sendSock.sendto(data.encode(),address)
     sendSock.close()
 
+threads = list()
+
+def thread_decorator(func):
+    def wrapper(*args):
+        x = threading.Thread(target = func, args = args)
+        threads.append(x)
+        x.start()
+        """x.start muss raus. Zweiter neuer Tread wird der router, der sich um die queue mit threads kümmert. Main stect in der schleife. """
+    return wrapper
+
+@thread_decorator
 def register(name, value, sid):
     """Gets a KeyError if SID doesn't exist, so a new SID gets created."""
     if not isinstance(name, str):
@@ -92,65 +133,67 @@ def register(name, value, sid):
         return "ValueError(Value isn't a string)"
     if not isinstance(sid, str):
         return "ValueError(sid isn't a string)"
+    data = db.p()
     try:
-        data = get_data()
         data[sid][name] = value
-        store_data(data)
     except KeyError:
         print("KeyError")
         data[sid] = {}
-        data[sid][name] = value
-        store_data(data)
+        data[sid][name] = value       
+    db.v(data)
+    print(data)
     return f"Name '{name}' got {value} as value."
 
+@thread_decorator
 def unregister(name, sid):
     if not isinstance(name, str):
         return "ValueError(Value isn't a string)"
     if not isinstance(sid, str):
         return "ValueError(sid isn't a string)"
+    data = db.p()
     try:
-        data = get_data()
-        print(data)
-        
         del data[sid][name]
-        print(data)
-        store_data(data)
+        db.v(data)
         return f"Deleted Client with Name: {name}"
     except KeyError:
+        db.v(data)
         return f"Key '{name}' not found!"
 
-    
+@thread_decorator  
 def query(sid):
     if not isinstance(sid, str):
         return "ValueError(sid isn't a string)"
+    data = db.p()
     try:
-        data = get_data()
-        print(data[sid])
-        print(data)
+        db.v(data)
         return data[sid]
     except KeyError:
+        db.v(data)
         return "KeyError(SID does not exist)!"
 
+@thread_decorator
 def reset(sid):
     if not isinstance(sid, str):
         return "ValueError(sid isn't a string)"
+    data = db.p()
     try:
-        data = get_data()
-        print(data)
         del data[sid]
-        print(data)
-        store_data(data)        
+        db.v(data)        
         return "Database got cleared!"
     except KeyError:
+        db.v(data)
         return "KeyError(SID does not exist)!"
 
-def exit(*args):
+@thread_decorator
+def exit1(*args):
     print("------------------Server shut down---------------------")
     #sys.exit("Sever shut down. In sys.exit()")
     
-    
+@thread_decorator 
 def reset_all():
-    store_data({})
+    data = db.p()
+    data = {}
+    db.v(data)
     return "All data got deleted"
 
         
@@ -171,4 +214,3 @@ def store_data(data):
 
 if __name__ == '__main__':
     echo_server()
-    
