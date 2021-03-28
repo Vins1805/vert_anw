@@ -1,8 +1,6 @@
-#!/bin/sh
-while :
-do
-  echo Server starting
-  python echoServerUDP.py
-  pause
+#!/bin/bash
+while :; do
+  if [[ ! $(pgrep -f echoServerUDP.py) ]]; then
+      echoServerUDP.py
+  fi
 done
-exit /b 0

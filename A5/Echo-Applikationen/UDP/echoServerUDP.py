@@ -189,7 +189,7 @@ def reset(sid):
 @thread_decorator
 def exit1(*args):
     print("------------------Server shut down---------------------")
-    sys.exit("Sever shut down. In sys.exit()")
+    #sys.exit("Sever shut down. In sys.exit()")
     
 @thread_decorator 
 def reset_all(*args):
