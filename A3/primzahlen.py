@@ -91,18 +91,18 @@ if __name__ == "__main__":
     print_locks = False
 
     # CHANGE AMOUNT OF THREADS
-    threads = 124
+    threads = 100000
     
     real_prime_numbers = read_txt("echte_primzahlen.txt")
     fake_prime_numbers = read_txt("fake_primzahlen.txt")
 
     # CHANGE TO TRUE TO RUN CODE
-    if True:
+    if False:
         # for one number n the primenumber
         n = 5000000
         build_threads(n)
     
-    if False:
+    if True:
         # read all real prime numbers from text file
         for pn in real_prime_numbers:
             if pn < threads*2:
@@ -110,7 +110,7 @@ if __name__ == "__main__":
                 continue
             build_threads(pn, print_locks)
 
-    if False:
+    if True:
         # read all fake prime numbers from text file
         for pn in fake_prime_numbers:
             if pn < threads*2:

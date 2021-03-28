@@ -40,7 +40,7 @@ def receiveMSG(sock) -> str:
 
 
 if __name__ == '__main__':
-    msg["function"] = "query"
+    msg["function"] = "exit"
     msg["name"] = "ip2"
     msg["value"] = "127.0.0.1"
     msg["SID"] = "1234"

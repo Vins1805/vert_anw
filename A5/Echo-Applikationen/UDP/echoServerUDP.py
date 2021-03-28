@@ -10,14 +10,17 @@ import socket
 import json
 import sys
 import pickle
-import threading
+import threading, queue
+import os
+
+
 
 
 host = '0.0.0.0'
 sport = 53      # own port
 dataSize = 1024
 
-
+q = queue.Queue()
 
 
 
@@ -57,6 +60,7 @@ def echo_server():
     while True: 
         print("Waiting to receive message")
         data, address = receiveSock.recvfrom(dataSize)
+
         
         if data:
             print("receive data: %s from %s" % (data,address))
@@ -97,31 +101,31 @@ def echo_server():
             else:
                 data = "NameError(function not found)"
             
+            #Alle Fehler wurden abgedeckt. Data kann nur None sein, wenn es sich um einen Thread handelt. dann soll er die Message aus der queue nehmen
+            if data == None:
+                data = q.get()                
             print("sent %s bytes back to %s" % (data,address))
             sendMSG(data,address)
 
 def to_json_decorator(func):
     def wrapper(data,address):
-        print(data)
         func(json.dumps({"message": data}), address)
     return wrapper
 
 @to_json_decorator
 def sendMSG(data,address):
-    print(data)
     sendSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sendSock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sendSock.sendto(data.encode(),address)
     sendSock.close()
 
-threads = list()
+
 
 def thread_decorator(func):
     def wrapper(*args):
-        x = threading.Thread(target = func, args = args)
-        threads.append(x)
+        x = threading.Thread(target = lambda arg, queue: queue.put(func(*arg)), args = (args, q))
         x.start()
-        """x.start muss raus. Zweiter neuer Tread wird der router, der sich um die queue mit threads kümmert. Main stect in der schleife. """
+        x.join()
     return wrapper
 
 @thread_decorator
@@ -141,7 +145,6 @@ def register(name, value, sid):
         data[sid] = {}
         data[sid][name] = value       
     db.v(data)
-    print(data)
     return f"Name '{name}' got {value} as value."
 
 @thread_decorator
@@ -164,11 +167,10 @@ def query(sid):
     if not isinstance(sid, str):
         return "ValueError(sid isn't a string)"
     data = db.p()
+    db.v(data)
     try:
-        db.v(data)
         return data[sid]
     except KeyError:
-        db.v(data)
         return "KeyError(SID does not exist)!"
 
 @thread_decorator
@@ -187,10 +189,10 @@ def reset(sid):
 @thread_decorator
 def exit1(*args):
     print("------------------Server shut down---------------------")
-    #sys.exit("Sever shut down. In sys.exit()")
+    sys.exit("Sever shut down. In sys.exit()")
     
 @thread_decorator 
-def reset_all():
+def reset_all(*args):
     data = db.p()
     data = {}
     db.v(data)
@@ -213,4 +215,5 @@ def store_data(data):
     
 
 if __name__ == '__main__':
-    echo_server()
+    while True:
+        echo_server()
