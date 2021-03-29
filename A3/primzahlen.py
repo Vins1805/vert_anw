@@ -91,7 +91,7 @@ if __name__ == "__main__":
     print_locks = False
 
     # CHANGE AMOUNT OF THREADS
-    threads = 8
+    threads = 100000
     
     real_prime_numbers = read_txt("echte_primzahlen.txt")
     fake_prime_numbers = read_txt("fake_primzahlen.txt")
