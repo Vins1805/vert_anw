@@ -8,6 +8,7 @@ exit /b 0
 #!/usr/bin/env python
 import socket
 import json
+import time
 
 host = '127.0.0.1'
 sport = 53
@@ -17,6 +18,7 @@ msg = dict()
 
 def echo_client(message):
     sendSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    time.sleep(0.5)
     try:
         print("Sending %s to %s:%s" % (message,host,sport))
         sendMSG(sendSock, message)
