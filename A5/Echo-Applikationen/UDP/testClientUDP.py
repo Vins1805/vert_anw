@@ -150,7 +150,7 @@ def test_exit1(sid="1234"):
     for _ in range(0,10):
         msg = {"function": "exit"}
         echo_client(json.dumps(msg))
-        time.sleep(2)
+        time.sleep(2.5)
     msg = {"function": "query", "SID": sid}
     assert echo_client(json.dumps(msg)) == {'localhost1': '127.0.0.1', 'localhost2': '127.0.0.2'}
     
@@ -162,7 +162,7 @@ def test_exit2(sid="1235"):
     echo_client(json.dumps(msg))
     msg = {"function": "exit"}
     echo_client(json.dumps(msg))
-    time.sleep(2)
+    time.sleep(2.5)
     msg = {"function": "unregister", "name": "localhost1", "value": "127.0.0.2", "SID": sid}
     echo_client(json.dumps(msg))
     msg = {"function": "query", "SID": sid}
@@ -174,7 +174,7 @@ def test_exit3(sid="1234"):
     echo_client(json.dumps(msg))
     msg = {"function": "exit"}
     echo_client(json.dumps(msg))
-    time.sleep(2)
+    time.sleep(2.5)
     msg = {"function": "reset", "SID": sid}
     echo_client(json.dumps(msg))
     msg = {"function": "query", "SID": sid}

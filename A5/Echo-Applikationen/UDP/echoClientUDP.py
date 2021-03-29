@@ -18,7 +18,7 @@ msg = dict()
 
 def echo_client(message):
     sendSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    time.sleep(0.5)
+    time.sleep(.2)
     try:
         print("Sending %s to %s:%s" % (message,host,sport))
         sendMSG(sendSock, message)
