@@ -1,0 +1,8 @@
+Das Script primzahlen.py läuft bei uns sehr langsam. Trotz 100.000 Threads. Je mehr Threads wir benutzen, desto schneller läuft das Programm.
+Allerdings braucht das Program selbst mit 100.000 für die vorletzte Zahl 982451653 mehr als eine Nacht. Unsere Erkenntnis ist,
+dass der Prozess umso länger dauert,
+je größer die Zahlen sind, da jedes mal die Fakultäten von sehr großen Zahlen berechnet werden müssen. Durch eine Vielzahl von Threads,
+wird das Produkt geringer und es wird so mit kleineren Zahlen gearbeitet.
+Im beigefügten Screenshot ist zu sehen, dass für die anfänglichen kleinen Zahlen übersprungen werden, da die Anzahl von Threads > n/2 ist.
+Die für die Berechnung der Zahlen danach benötigen die 300.000 Threads nur ein paar Minuten. Jedoch ist im Screenshot zu sehen, dass die Zeit zur Berechnung
+exponentiel ansteigt.

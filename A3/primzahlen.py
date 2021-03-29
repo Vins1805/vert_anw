@@ -91,7 +91,8 @@ if __name__ == "__main__":
     print_locks = False
 
     # CHANGE AMOUNT OF THREADS
-    threads = 100000
+    threads = 300000
+    print("threads: ", threads)
     
     real_prime_numbers = read_txt("echte_primzahlen.txt")
     fake_prime_numbers = read_txt("fake_primzahlen.txt")
@@ -109,6 +110,10 @@ if __name__ == "__main__":
                 print(f"skipped number {pn} due to conflicts with threads.")
                 continue
             build_threads(pn, print_locks)
+            system_end_time = time.time()
+            process_end_time = time.process_time()
+            print(f"system time: {system_end_time - system_start_time}")
+            print(f"process time: {process_end_time - process_start_time}")
 
     if True:
         # read all fake prime numbers from text file
@@ -117,6 +122,10 @@ if __name__ == "__main__":
                 print(f"skipped number {pn} due to conflicts with threads.")
                 continue
             build_threads(pn, print_locks)
+            system_end_time = time.time()
+            process_end_time = time.process_time()
+            print(f"system time: {system_end_time - system_start_time}")
+            print(f"process time: {process_end_time - process_start_time}")
     
 
     system_end_time = time.time()
