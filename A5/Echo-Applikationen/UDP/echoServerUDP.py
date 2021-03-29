@@ -12,8 +12,7 @@ import sys
 import pickle
 import threading, queue
 import os
-
-
+import time
 
 
 host = '0.0.0.0'
@@ -21,8 +20,6 @@ sport = 53      # own port
 dataSize = 1024
 
 q = queue.Queue()
-
-
 
 
 class Datenbank():
@@ -60,7 +57,6 @@ def echo_server():
     while True: 
         print("Waiting to receive message")
         data, address = receiveSock.recvfrom(dataSize)
-
         
         if data:
             print("receive data: %s from %s" % (data,address))
@@ -92,7 +88,7 @@ def echo_server():
                 except KeyError:
                     data = "Name, Value or SID is missing!"
             elif func == "exit":
-                data = exit1()
+                exit1(address)
             elif func == "reset_all":
                 try:
                     data = reset_all()
@@ -141,7 +137,6 @@ def register(name, value, sid):
     try:
         data[sid][name] = value
     except KeyError:
-        print("KeyError")
         data[sid] = {}
         data[sid][name] = value       
     db.v(data)
@@ -186,16 +181,17 @@ def reset(sid):
         db.v(data)
         return "KeyError(SID does not exist)!"
 
-@thread_decorator
-def exit1(*args):
+def exit1(address):
     print("------------------Server shut down---------------------")
-    #sys.exit("Sever shut down. In sys.exit()")
+    data = "Sever shut down. In sys.exit()"
+    sendMSG(data,address)
+    time.sleep(1)
+    sys.exit(data)
     
 @thread_decorator 
 def reset_all(*args):
-    data = db.p()
-    data = {}
-    db.v(data)
+    db.p()
+    db.v(dict())
     return "All data got deleted"
 
         
@@ -215,5 +211,4 @@ def store_data(data):
     
 
 if __name__ == '__main__':
-    while True:
-        echo_server()
+    echo_server()

@@ -2,6 +2,7 @@
 
 import pytest
 from echoClientUDP import *
+import time
 
 
 def reset_decorator(func):
@@ -142,19 +143,42 @@ def test_reset4(sid="1234"):
 
 @reset_decorator
 def test_exit1(sid="1234"):
-    msg = {"function": "register", "name": "localhostbnbniljhnilhloi", "value": "127.0.0.1", "SID": sid}
+    msg = {"function": "register", "name": "localhost1", "value": "127.0.0.1", "SID": sid}
     echo_client(json.dumps(msg))
-    msg = {"function": "register", "name": "localhost", "value": "127.0.0.2", "SID": sid}
+    msg = {"function": "register", "name": "localhost2", "value": "127.0.0.2", "SID": sid}
+    echo_client(json.dumps(msg))
+    for _ in range(0,10):
+        msg = {"function": "exit"}
+        echo_client(json.dumps(msg))
+        time.sleep(2)
+    msg = {"function": "query", "SID": sid}
+    assert echo_client(json.dumps(msg)) == {'localhost1': '127.0.0.1', 'localhost2': '127.0.0.2'}
+    
+@reset_decorator
+def test_exit2(sid="1235"):
+    msg = {"function": "register", "name": "localhost1", "value": "127.0.0.1", "SID": sid}
+    echo_client(json.dumps(msg))
+    msg = {"function": "register", "name": "localhost2", "value": "127.0.0.2", "SID": sid}
     echo_client(json.dumps(msg))
     msg = {"function": "exit"}
     echo_client(json.dumps(msg))
+    time.sleep(2)
+    msg = {"function": "unregister", "name": "localhost1", "value": "127.0.0.2", "SID": sid}
+    echo_client(json.dumps(msg))
     msg = {"function": "query", "SID": sid}
-    assert echo_client(json.dumps(msg)) == {'localhost': '127.0.0.1', 'localhost': '127.0.0.2'}
-    
+    assert echo_client(json.dumps(msg)) == {'localhost2': '127.0.0.2'}
 
-
-
-
+@reset_decorator
+def test_exit3(sid="1234"):
+    msg = {"function": "register", "name": "localhost10", "value": "127.0.0.1", "SID": sid}
+    echo_client(json.dumps(msg))
+    msg = {"function": "exit"}
+    echo_client(json.dumps(msg))
+    time.sleep(2)
+    msg = {"function": "reset", "SID": sid}
+    echo_client(json.dumps(msg))
+    msg = {"function": "query", "SID": sid}
+    assert echo_client(json.dumps(msg)) == "KeyError(SID does not exist)!"
 
 
 
